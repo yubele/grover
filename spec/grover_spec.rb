@@ -6,6 +6,7 @@ describe Grover do
   let(:grover) { described_class.new(url_or_html, **options) }
   let(:url_or_html) { 'http://google.com' }
   let(:options) { {} }
+  let(:processor) { instance_double Grover::Processor }
 
   describe '.new' do
     subject(:new) { described_class.new('http://google.com') }
@@ -44,8 +45,6 @@ describe Grover do
   describe '#to_pdf' do
     subject(:to_pdf) { grover.to_pdf }
 
-    let(:processor) { instance_double 'Grover::Processor' }
-
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
 
     it 'calls to Grover::Processor' do
@@ -62,10 +61,10 @@ describe Grover do
       it 'calls to Grover::Processor with the path specified' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, 'path' => '/foo/bar').
+            with(:pdf, url_or_html, { 'path' => '/foo/bar' }).
             and_return('some PDF content')
         )
-        expect(processor).to receive(:convert).with(:pdf, url_or_html, 'path' => '/foo/bar')
+        expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'path' => '/foo/bar' })
         expect(to_pdf).to eq 'some PDF content'
       end
 
@@ -104,10 +103,10 @@ describe Grover do
       it 'builds options and passes them through to the processor' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, 'headerTemplate' => 'Some header').
+            with(:pdf, url_or_html, { 'headerTemplate' => 'Some header' }).
             and_return('some PDF content')
         )
-        expect(processor).to receive(:convert).with(:pdf, url_or_html, 'headerTemplate' => 'Some header')
+        expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'headerTemplate' => 'Some header' })
         expect(to_pdf).to eq 'some PDF content'
       end
 
@@ -129,12 +128,12 @@ describe Grover do
         it 'builds options, overriding global options, and passes them through to the processor' do
           allow(processor).to(
             receive(:convert).
-              with(:pdf, url_or_html, 'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer').
+              with(:pdf, url_or_html, { 'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer' }).
               and_return('some PDF content')
           )
           expect(processor).to(
             receive(:convert).
-              with(:pdf, url_or_html, 'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer')
+              with(:pdf, url_or_html, { 'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer' })
           )
           expect(to_pdf).to eq 'some PDF content'
         end
@@ -171,12 +170,12 @@ describe Grover do
       it 'builds options and passes them through to the processor' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, 'footerTemplate' => "<div class='text'>Footer with \"quotes\" in it</div>").
+            with(:pdf, url_or_html, { 'footerTemplate' => "<div class='text'>Footer with \"quotes\" in it</div>" }).
             and_return('some PDF content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, 'footerTemplate' => "<div class='text'>Footer with \"quotes\" in it</div>")
+            with(:pdf, url_or_html, { 'footerTemplate' => "<div class='text'>Footer with \"quotes\" in it</div>" })
         )
         expect(to_pdf).to eq 'some PDF content'
       end
@@ -196,10 +195,10 @@ describe Grover do
       it 'builds options and passes them through to the processor' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, 'launchArgs' => ['--disable-speech-api']).
+            with(:pdf, url_or_html, { 'launchArgs' => ['--disable-speech-api'] }).
             and_return('some PDF content')
         )
-        expect(processor).to receive(:convert).with(:pdf, url_or_html, 'launchArgs' => ['--disable-speech-api'])
+        expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'launchArgs' => ['--disable-speech-api'] })
         expect(to_pdf).to eq 'some PDF content'
       end
     end
@@ -218,10 +217,10 @@ describe Grover do
       it 'builds options and passes them through to the processor' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, 'displayHeaderFooter' => false).
+            with(:pdf, url_or_html, { 'displayHeaderFooter' => false }).
             and_return('some PDF content')
         )
-        expect(processor).to receive(:convert).with(:pdf, url_or_html, 'displayHeaderFooter' => false)
+        expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'displayHeaderFooter' => false })
         expect(to_pdf).to eq 'some PDF content'
       end
     end
@@ -243,12 +242,12 @@ describe Grover do
       it 'builds options and passes them through to the processor' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 }).
+            with(:pdf, url_or_html, { 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 } }).
             and_return('some PDF content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 })
+            with(:pdf, url_or_html, { 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 } })
         )
         expect(to_pdf).to eq 'some PDF content'
       end
@@ -275,8 +274,6 @@ describe Grover do
   describe '#screenshot' do
     subject(:screenshot) { grover.screenshot }
 
-    let(:processor) { instance_double 'Grover::Processor' }
-
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
 
     it 'calls to Grover::Processor' do
@@ -291,10 +288,10 @@ describe Grover do
       it 'calls to Grover::Processor with the path specified' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, 'path' => '/foo/bar').
+            with(:screenshot, url_or_html, { 'path' => '/foo/bar' }).
             and_return('some image content')
         )
-        expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'path' => '/foo/bar')
+        expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'path' => '/foo/bar' })
         expect(screenshot).to eq 'some image content'
       end
     end
@@ -308,10 +305,10 @@ describe Grover do
         it 'calls to Grover::Processor with the type specified' do
           allow(processor).to(
             receive(:convert).
-              with(:screenshot, url_or_html, 'type' => 'png').
+              with(:screenshot, url_or_html, { 'type' => 'png' }).
               and_return('some image content')
           )
-          expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'type' => 'png')
+          expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'type' => 'png' })
           expect(screenshot).to eq 'some image content'
         end
       end
@@ -322,10 +319,10 @@ describe Grover do
         it 'calls to Grover::Processor with the type specified' do
           allow(processor).to(
             receive(:convert).
-              with(:screenshot, url_or_html, 'type' => 'jpeg').
+              with(:screenshot, url_or_html, { 'type' => 'jpeg' }).
               and_return('some image content')
           )
-          expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'type' => 'jpeg')
+          expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'type' => 'jpeg' })
           expect(screenshot).to eq 'some image content'
         end
       end
@@ -361,10 +358,10 @@ describe Grover do
       it 'builds options and passes them through to the processor' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, 'headerTemplate' => 'Some header').
+            with(:screenshot, url_or_html, { 'headerTemplate' => 'Some header' }).
             and_return('some image content')
         )
-        expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'headerTemplate' => 'Some header')
+        expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'headerTemplate' => 'Some header' })
         expect(screenshot).to eq 'some image content'
       end
 
@@ -389,7 +386,7 @@ describe Grover do
               with(
                 :screenshot,
                 url_or_html,
-                'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer'
+                { 'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer' }
               ).
               and_return('some image content')
           )
@@ -398,7 +395,7 @@ describe Grover do
               with(
                 :screenshot,
                 url_or_html,
-                'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer'
+                { 'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer' }
               )
           )
           expect(screenshot).to eq 'some image content'
@@ -438,7 +435,7 @@ describe Grover do
             with(
               :screenshot,
               url_or_html,
-              'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 }
+              { 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 } }
             ).
             and_return('some image content')
         )
@@ -447,7 +444,7 @@ describe Grover do
             with(
               :screenshot,
               url_or_html,
-              'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 }
+              { 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 } }
             )
         )
         expect(screenshot).to eq 'some image content'
@@ -458,17 +455,15 @@ describe Grover do
   describe '#to_png' do
     subject(:to_png) { grover.to_png }
 
-    let(:processor) { instance_double 'Grover::Processor' }
-
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
 
     it 'calls to Grover::Processor' do
       allow(processor).to(
         receive(:convert).
-          with(:screenshot, url_or_html, 'type' => 'png').
+          with(:screenshot, url_or_html, { 'type' => 'png' }).
           and_return('some PNG content')
       )
-      expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'type' => 'png')
+      expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'type' => 'png' })
       expect(to_png).to eq 'some PNG content'
     end
 
@@ -478,10 +473,10 @@ describe Grover do
       it 'calls to Grover::Processor with the path specified' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, 'path' => '/foo/bar', 'type' => 'png').
+            with(:screenshot, url_or_html, { 'path' => '/foo/bar', 'type' => 'png' }).
             and_return('some PNG content')
         )
-        expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'path' => '/foo/bar', 'type' => 'png')
+        expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'path' => '/foo/bar', 'type' => 'png' })
         expect(to_png).to eq 'some PNG content'
       end
     end
@@ -490,17 +485,15 @@ describe Grover do
   describe '#to_jpeg' do
     subject(:to_jpeg) { grover.to_jpeg }
 
-    let(:processor) { instance_double 'Grover::Processor' }
-
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
 
     it 'calls to Grover::Processor' do
       allow(processor).to(
         receive(:convert).
-          with(:screenshot, url_or_html, 'type' => 'jpeg').
+          with(:screenshot, url_or_html, { 'type' => 'jpeg' }).
           and_return('some JPG content')
       )
-      expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'type' => 'jpeg')
+      expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'type' => 'jpeg' })
 
       expect(to_jpeg).to eq 'some JPG content'
     end
@@ -511,10 +504,11 @@ describe Grover do
       it 'calls to Grover::Processor with the path specified' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, 'path' => '/foo/bar', 'type' => 'jpeg').
+            with(:screenshot, url_or_html, { 'path' => '/foo/bar', 'type' => 'jpeg' }).
             and_return('some JPG content')
         )
-        expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'path' => '/foo/bar', 'type' => 'jpeg')
+        expect(processor).to receive(:convert).with(:screenshot, url_or_html,
+                                                    { 'path' => '/foo/bar', 'type' => 'jpeg' })
         expect(to_jpeg).to eq 'some JPG content'
       end
     end
@@ -523,7 +517,6 @@ describe Grover do
   describe '#to_html' do
     subject(:to_html) { grover.to_html }
 
-    let(:processor) { instance_double 'Grover::Processor' }
     let(:expected_html) { '<html><body>Some HTML</body></html>' }
 
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
@@ -610,36 +603,36 @@ describe Grover do
   describe '#show_front_cover?' do
     subject(:show_front_cover?) { grover.show_front_cover? }
 
-    it { is_expected.to eq false }
+    it { is_expected.to be false }
 
     context 'when option specified' do
       let(:options) { { front_cover_path: '/baz' } }
 
-      it { is_expected.to eq true }
+      it { is_expected.to be true }
     end
 
     context 'when the option isnt a path' do
       let(:options) { { front_cover_path: 'http://example.com/baz' } }
 
-      it { is_expected.to eq false }
+      it { is_expected.to be false }
     end
   end
 
   describe '#show_back_cover?' do
     subject(:show_back_cover?) { grover.show_back_cover? }
 
-    it { is_expected.to eq false }
+    it { is_expected.to be false }
 
     context 'when option specified' do
       let(:options) { { back_cover_path: '/baz' } }
 
-      it { is_expected.to eq true }
+      it { is_expected.to be true }
     end
 
     context 'when the option isnt a path' do
       let(:options) { { back_cover_path: 'http://example.com/baz' } }
 
-      it { is_expected.to eq false }
+      it { is_expected.to be false }
     end
   end
 
